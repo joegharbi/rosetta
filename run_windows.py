@@ -13,12 +13,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     
     # Add the arguments
-    parser.add_argument('erl_module', type=str)
-    parser.add_argument('erl_function', type=str)
-    parser.add_argument('erl_parameter', type=str)
-    parser.add_argument('--cmd', default='', type=str)
-    parser.add_argument('--exe', default='erl', type=str)
-    parser.add_argument('--rep', default=1, type=int)
+    parser.add_argument('erl_module', type=str,help='Provide the module.')
+    parser.add_argument('erl_function', type=str,help='Provide the function.')
+    parser.add_argument('erl_parameter', type=str,help='Provide the argument for the function.')
+    parser.add_argument('--cmd', default='', type=str,help='Provide the command to run the script.')
+    parser.add_argument('--exe', default='erl', type=str,help='Provide the process name of the program you want to measure.')
+    parser.add_argument('--rep', default=1, type=int,help='Provide the number of repetition.')
     
     # Parse the arguments
     args = parser.parse_args()
