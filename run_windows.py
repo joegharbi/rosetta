@@ -10,15 +10,18 @@ import os
 if __name__ == "__main__":
 
     # Create the parser
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='A command line interface to measure '
+                                            +'energy consumption of process level using '
+                                            +'scaphander as a meter agent for Windows',
+                                    epilog='Github repository: https://github.com/joegharbi/rosetta')
     
     # Add the arguments
-    parser.add_argument('erl_module', type=str,help='Provide the module.')
-    parser.add_argument('erl_function', type=str,help='Provide the function.')
-    parser.add_argument('erl_parameter', type=str,help='Provide the argument for the function.')
-    parser.add_argument('--cmd', default='', type=str,help='Provide the command to run the script.')
-    parser.add_argument('--exe', default='erl', type=str,help='Provide the process name of the program you want to measure.')
-    parser.add_argument('--rep', default=1, type=int,help='Provide the number of repetition.')
+    parser.add_argument('erl_module',metavar= 'module', type=str,help='Provide the module.')
+    parser.add_argument('erl_function', metavar='function', type=str,help='Provide the function.')
+    parser.add_argument('erl_parameter', metavar='parameter', type=str,help='Provide the argument for the function.')
+    parser.add_argument('-c', metavar='command', default='', type=str,help='Provide the command to run the program executable.')
+    parser.add_argument('-e', metavar='executable', default='erl', type=str,help='Provide the process name of the program you want to measure without extension.')
+    parser.add_argument('-r', metavar='repetition', default=1, type=int,help='Provide the number of repetition.')
     
     # Parse the arguments
     args = parser.parse_args()
