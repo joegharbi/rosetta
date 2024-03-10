@@ -13,25 +13,25 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='A command line interface to measure '
                                             +'energy consumption of process level using '
                                             +'scaphander as a meter agent for Windows',
-                                    epilog='Github repository: https://github.com/joegharbi/rosetta')
+                                    epilog='GitHub repository: https://github.com/joegharbi/rosetta')
     
     # Add the arguments
-    parser.add_argument('erl_module',metavar= 'module', type=str,help='Provide the module.')
-    parser.add_argument('erl_function', metavar='function', type=str,help='Provide the function.')
-    parser.add_argument('erl_parameter', metavar='parameter', type=str,help='Provide the argument for the function.')
-    parser.add_argument('-c', metavar='command', default='', type=str,help='Provide the command to run the program executable.')
-    parser.add_argument('-e', metavar='executable', default='erl', type=str,help='Provide the process name of the program you want to measure without extension.')
-    parser.add_argument('-r', metavar='repetition', default=1, type=int,help='Provide the number of repetition.')
+    parser.add_argument('module',metavar= 'module', type=str,help='Provide the module.')
+    parser.add_argument('function', metavar='function', type=str,help='Provide the function.')
+    parser.add_argument('parameters', nargs='+', metavar='parameters', type=str,help='Provide one or more arguments as input for the function seperated by space.')
+    parser.add_argument('-c','--cmd', metavar='command', default='', type=str,help='Provide the command to run the program executable.')
+    parser.add_argument('-e','--exe', metavar='executable', default='erl', type=str,help='Provide the process name of the program you want to measure without extension.')
+    parser.add_argument('-r','--rep', metavar='repetition', default=1, type=int,help='Provide the number of repetition.')
     
     # Parse the arguments
     args = parser.parse_args()
     
-    erl_module = args.erl_module
-    erl_function = args.erl_function
-    erl_parameter = args.erl_parameter
+    module = args.module
+    function = args.function
+    parameters = args.parameters
     rep = args.rep
 
-    # Programming language we are measuring in process level name without extention
+    # Programming language we are measuring in process level name without extension
     # by default it is erl for Erlang
     prog_lang = args.exe
 
@@ -39,70 +39,72 @@ if __name__ == "__main__":
 
     exe_prog_lang = f"{prog_lang}.exe"
 
-    # Repeat the measurement for the given number of repetitions
-    for _ in range(rep):  
-        # Json file name
-        file_name = f"{erl_module}_{erl_function}_{erl_parameter}"
 
-        # Prepare the scaphandre command
-        command = "scaphandre json -n 100000 -m 100 -f "+file_name+".json"
-        # Start the scaphandre measuring agent
-        subprocess.Popen(command,stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell= True)
-        # Wait for 5 seconds for scaphandre to create json file to dump the data
-        time.sleep(5)
+    for parameter in parameters:
+        # Repeat the measurement for the given number of repetitions
+        for _ in range(rep):  
+            # Json file name
+            file_name = f"{module}_{function}_{parameter}"
 
-        if (measure_cmd == ''):
-            # Create the command function to measure
-            erl_command = "erl -noshell -run " + erl_module + " " + erl_function + " " + erl_parameter + " -s init stop"
-        print(erl_command)
-        process = subprocess.Popen(erl_command,stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell= True)
-        start_time = timeit.default_timer()
+            # Prepare the scaphandre command
+            command = "scaphandre json -n 100000 -m 100 -f "+file_name+".json"
+            # Start the scaphandre measuring agent
+            subprocess.Popen(command,stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell= True)
+            # Wait for 5 seconds for scaphandre to create json file to dump the data
+            time.sleep(5)
 
-        # Wait for the function to run
-        process.wait()
+            if (measure_cmd == ''):
+                # Create the command function to measure
+                erl_command = "erl -noshell -run " + module + " " + function + " " + parameter + " -s init stop"
+            print(erl_command)
+            process = subprocess.Popen(erl_command,stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell= True)
+            start_time = timeit.default_timer()
 
-        end_time = timeit.default_timer()
+            # Wait for the function to run
+            process.wait()
 
-        # Get the total runtime of the function
-        runtime = end_time - start_time
+            end_time = timeit.default_timer()
 
-        # Then kill scaphandre process to stop the measurement
-        subprocess.run(f'taskkill /F /IM scaphandre.exe', shell=True)
-        # Then kill the erlang process
-        subprocess.run(f'taskkill /F /IM erl.exe', shell=True)
+            # Get the total runtime of the function
+            runtime = end_time - start_time
 
-        current_path = os.getcwd()
-        json_file_path = os.path.join(current_path, f"{file_name}.json")
+            # Then kill scaphandre process to stop the measurement
+            subprocess.run(f'taskkill /F /IM scaphandre.exe', shell=True)
+            # Then kill the erlang process
+            subprocess.run(f'taskkill /F /IM erl.exe', shell=True)
 
-        # Read JSON data from the file
-        with open(json_file_path, "r") as file:
-            data = json.load(file)
+            current_path = os.getcwd()
+            json_file_path = os.path.join(current_path, f"{file_name}.json")
 
-        # Initialize total consumption variables
-        total_server_consumption = 0.0
-        number_samples = 0
-        average_energy = 0
+            # Read JSON data from the file
+            with open(json_file_path, "r") as file:
+                data = json.load(file)
 
-        # Iterate through entries
-        for entry in data:
-            consumers = entry.get("consumers", [])
-            for consumer in consumers:
-                exe = consumer.get("exe", "")
-                consumption = consumer.get("consumption", 0.0)
-                
-                # Check for consumption
-                if exe_prog_lang in exe.lower():
-                    total_server_consumption += consumption
-                    number_samples +=1
-        if (number_samples != 0):
-            average_energy = total_server_consumption / number_samples
+            # Initialize total consumption variables
+            total_server_consumption = 0.0
+            number_samples = 0
+            average_energy = 0
 
-        final_consumption = average_energy * runtime
+            # Iterate through entries
+            for entry in data:
+                consumers = entry.get("consumers", [])
+                for consumer in consumers:
+                    exe = consumer.get("exe", "")
+                    consumption = consumer.get("consumption", 0.0)
+                    
+                    # Check for consumption
+                    if exe_prog_lang in exe.lower():
+                        total_server_consumption += consumption
+                        number_samples +=1
+            if (number_samples != 0):
+                average_energy = total_server_consumption / number_samples
 
-        # Write runtime and function name to the csv file
-        with open(f"{prog_lang}_{erl_module}.csv", 'a', newline='') as csv_file:
-            csv_writer = csv.writer(csv_file, delimiter=';')
-            csv_writer.writerow([erl_module, erl_function, erl_parameter, number_samples, final_consumption, runtime])
+            final_consumption = average_energy * runtime
+
+            # Write runtime and function name to the csv file
+            with open(f"{prog_lang}_{module}.csv", 'a', newline='') as csv_file:
+                csv_writer = csv.writer(csv_file, delimiter=';')
+                csv_writer.writerow([module, function, parameter, number_samples, final_consumption, runtime])
 
     # Exit the program
     sys.exit()
