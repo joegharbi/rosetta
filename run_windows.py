@@ -16,6 +16,7 @@ if __name__ == "__main__":
     parser.add_argument('erl_module', type=str)
     parser.add_argument('erl_function', type=str)
     parser.add_argument('erl_parameter', type=str)
+    parser.add_argument('--cmd', default='', type=str)
     parser.add_argument('--exe', default='erl', type=str)
     parser.add_argument('--rep', default=1, type=int)
     
@@ -31,6 +32,8 @@ if __name__ == "__main__":
     # by default it is erl for Erlang
     prog_lang = args.exe
 
+    measure_cmd = args.cmd
+
     exe_prog_lang = f"{prog_lang}.exe"
 
     # Repeat the measurement for the given number of repetitions
@@ -45,8 +48,9 @@ if __name__ == "__main__":
         # Wait for 5 seconds for scaphandre to create json file to dump the data
         time.sleep(5)
 
-        # Create the command function to measure
-        erl_command = "erl -noshell -run " + erl_module + " " + erl_function + " " + erl_parameter + " -s init stop"
+        if (measure_cmd == ''):
+            # Create the command function to measure
+            erl_command = "erl -noshell -run " + erl_module + " " + erl_function + " " + erl_parameter + " -s init stop"
         print(erl_command)
         process = subprocess.Popen(erl_command,stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell= True)
         start_time = timeit.default_timer()
