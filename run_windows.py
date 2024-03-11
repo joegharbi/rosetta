@@ -31,7 +31,7 @@ if __name__ == "__main__":
     function = args.function
     parameters = args.parameters
     rep = args.rep
-    csv_file = args.file
+    result_file = args.file
 
     # Programming language we are measuring in process level name without extension
     # by default it is erl for Erlang
@@ -104,10 +104,10 @@ if __name__ == "__main__":
             final_consumption = average_energy * runtime
 
             # Check result csv file name
-            if(csv_file==''):
-                csv_file = f"{prog_lang}_{module}.csv"
+            if(result_file==''):
+                result_file = f"{prog_lang}_{module}"
             # Write results to the csv file
-            with open(csv_file, 'a', newline='') as csv_file:
+            with open(f"{result_file}.csv", 'a', newline='') as csv_file:
                 csv_writer = csv.writer(csv_file, delimiter=';')
                 csv_writer.writerow([module, function, parameter, number_samples, final_consumption, runtime])
 
