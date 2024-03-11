@@ -22,6 +22,7 @@ if __name__ == "__main__":
     parser.add_argument('-c','--cmd', metavar='command', default='', type=str,help='Provide the command to run the program executable.')
     parser.add_argument('-e','--exe', metavar='executable', default='erl', type=str,help='Provide the process name of the program you want to measure without extension.')
     parser.add_argument('-r','--rep', metavar='repetition', default=1, type=int,help='Provide the number of repetition.')
+    parser.add_argument('-f','--file', metavar='file', default='', type=str,help='Provide the csv file name of the result by default executable_module.')
     
     # Parse the arguments
     args = parser.parse_args()
@@ -30,6 +31,7 @@ if __name__ == "__main__":
     function = args.function
     parameters = args.parameters
     rep = args.rep
+    csv_file = args.file
 
     # Programming language we are measuring in process level name without extension
     # by default it is erl for Erlang
@@ -101,8 +103,11 @@ if __name__ == "__main__":
 
             final_consumption = average_energy * runtime
 
-            # Write runtime and function name to the csv file
-            with open(f"{prog_lang}_{module}.csv", 'a', newline='') as csv_file:
+            # Check result csv file name
+            if(csv_file==''):
+                csv_file = f"{prog_lang}_{module}.csv"
+            # Write results to the csv file
+            with open(csv_file, 'a', newline='') as csv_file:
                 csv_writer = csv.writer(csv_file, delimiter=';')
                 csv_writer.writerow([module, function, parameter, number_samples, final_consumption, runtime])
 
