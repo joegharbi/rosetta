@@ -15,6 +15,9 @@ df['new_column'] = df.iloc[:, 4] / df.iloc[:, 5]
 # Group by the first three columns and calculate the mean of the remaining columns
 grouped_df = df.groupby(df.columns.tolist()[:3]).mean().reset_index()
 
+# Round the numbers to 2 decimal places
+grouped_df = grouped_df.round(2)
+
 # Check if the file exists and if it's empty
 file_exists = os.path.isfile(output_file)
 file_is_empty = file_exists and os.stat(output_file).st_size == 0
