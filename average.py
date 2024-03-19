@@ -9,6 +9,9 @@ output_file = sys.argv[2]
 # Load the data
 df = pd.read_csv(input_file, delimiter=';')
 
+# Convert the 5th column from microjoules to joules
+df.iloc[:, 4] = df.iloc[:, 4] / 1e6
+
 # Add a new column that is the result of dividing the 5th column by the 6th column
 df['new_column'] = df.iloc[:, 4] / df.iloc[:, 5]
 
