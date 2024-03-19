@@ -21,8 +21,8 @@ df = df.drop(df.columns[3], axis=1)
 # Group by the first three columns and calculate the mean of the remaining columns
 grouped_df = df.groupby(df.columns.tolist()[:3]).mean().reset_index()
 
-# Replace all NaN values with 0.0
-grouped_df = grouped_df.fillna(0.0)
+# # Replace all NaN values with 0.0
+# grouped_df = grouped_df.fillna(0.0)
 
 # Round the numbers to 2 decimal places
 grouped_df = grouped_df.round(2)
