@@ -12,8 +12,11 @@ df = pd.read_csv(input_file, delimiter=';')
 # Convert the 5th column from microjoules to joules
 df.iloc[:, 4] = df.iloc[:, 4] / 1e6
 
-# Add a new column that is the result of dividing the 5th column by the 6th column
-df['new_column'] = df.iloc[:, 4] / df.iloc[:, 5]
+# Add a new column that is the result of dividing the 4th column by the 5th column
+df['new_column'] = df.iloc[:, 3] / df.iloc[:, 4]
+
+# Drop the fourth column
+df = df.drop(df.columns[3], axis=1)
 
 # Group by the first three columns and calculate the mean of the remaining columns
 grouped_df = df.groupby(df.columns.tolist()[:3]).mean().reset_index()
